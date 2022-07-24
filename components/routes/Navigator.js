@@ -8,7 +8,7 @@ const Drawer = createDrawerNavigator();
 
 
 const Navigator = () => {
-  return null; (
+  return (
     <NavigationContainer>
       <Drawer.Navigator
         screenOptions={{
