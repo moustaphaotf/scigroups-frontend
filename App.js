@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
+import AppLoading from './screens/AppLoading';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -35,7 +36,7 @@ export default function App() {
         <StatusBar style="auto" />
       </View>
     ) : (
-      null
+      <AppLoading />
     )
   );
 }
