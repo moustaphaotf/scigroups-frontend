@@ -1,10 +1,10 @@
 import 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
-import AppLoading from './screens/AppLoading';
+import AppLoading from './components/screens/AppLoading';
+import Navigator from './components/routes/Navigator';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,10 +31,7 @@ export default function App() {
 
   return (
     fontLoaded ? (
-      <View style={styles.container}>
-        <Text style={styles.text}>Open up App.js to start working on your app!</Text>
-        <StatusBar style="auto" />
-      </View>
+      <Navigator />
     ) : (
       <AppLoading />
     )
