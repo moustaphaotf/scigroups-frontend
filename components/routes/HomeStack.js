@@ -10,9 +10,24 @@ const Stack = createStackNavigator();
 const HomeStack = () => {
   return (
     <Stack.Navigator
-      screenOptions={{
-        headerStyle: [globalStyles.headerStyle],
-        headerTitleStyle: globalStyles.headerTitleStyle,
+      screenOptions={({route}) => {
+        let title = '';
+        switch (route.name) {
+          case 'Student':
+            title = route.params?.lastname.toUpperCase() + ' ' + route.params?.firstname;
+            break;
+          case 'Group':
+            title = route.params?.name;
+            break;
+          default:
+            title = 'Accueil';
+            break;
+        }
+        return {
+          title: title,
+          headerStyle: [globalStyles.headerStyle],
+          headerTitleStyle: globalStyles.headerTitleStyle,
+        }
       }}
     >
       <Stack.Screen
@@ -20,7 +35,6 @@ const HomeStack = () => {
         component={Home} 
         options={({route, navigation}) => {
           return {
-            title:"Accueil",
             headerLeft: () => 
               <MaterialIcons 
                 style={{marginHorizontal: 15}} 
@@ -31,8 +45,14 @@ const HomeStack = () => {
               />
           }
         }}/>
-      <Stack.Screen name="Group" component={Group} options={{title:"Goupe Scientifique"}}/>
-      <Stack.Screen name="Student" component={Student} options={{title:"Elève"}}/>
+      <Stack.Screen 
+        name="Group" 
+        component={Group} 
+      />
+      <Stack.Screen 
+        name="Student" 
+        component={Student} 
+      />
     </Stack.Navigator>
   );
 }
