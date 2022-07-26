@@ -28,7 +28,7 @@ class RotatingCircle extends React.Component{
 
     return(
       <View style = {[
-        this.props.style, styles.stablizer
+        this.props.style, styles.stabilizer
       ]}>
         <AnimatedIcon 
           style={{
