@@ -2,7 +2,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Home from "../screens/Home";
 import Group from "../screens/Group";
 import Student from "../screens/Student";
-import Header from "../Header";
+import globalStyles from "../../global";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const Stack = createStackNavigator();
 
@@ -10,22 +11,24 @@ const HomeStack = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: {
-          backgroundColor: "#5f4a93"
-        },
-        headerTitleStyle: {
-          color: '#eee'
-        },
-        
+        headerStyle: [globalStyles.headerStyle],
+        headerTitleStyle: globalStyles.headerTitleStyle,
       }}
     >
-      <Stack.Screen 
+      <Stack.Screen
         name="Home" 
         component={Home} 
-        options={({navigation}) => {
+        options={({route, navigation}) => {
           return {
             title:"Accueil",
-            headerTitle: (options) => <Header navigation={navigation} {...options}/>
+            headerLeft: () => 
+              <MaterialIcons 
+                style={{marginHorizontal: 15}} 
+                name="menu" 
+                color='#eee' 
+                size={24} 
+                onPress={navigation.openDrawer} 
+              />
           }
         }}/>
       <Stack.Screen name="Group" component={Group} options={{title:"Goupe Scientifique"}}/>
