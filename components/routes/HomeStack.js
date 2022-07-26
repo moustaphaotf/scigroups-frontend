@@ -24,6 +24,7 @@ const HomeStack = () => {
             break;
         }
         return {
+          headerMode: 'float',
           title: title,
           headerStyle: [globalStyles.headerStyle],
           headerTitleStyle: globalStyles.headerTitleStyle,
