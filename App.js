@@ -33,7 +33,7 @@ export default function App() {
     fontLoaded ? (
       <Navigator />
     ) : (
-      <AppLoading />
+      <AppLoading text='Scientific Groups'/>
     )
   );
 }

@@ -1,12 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
 import RotatingCircle from "../RotatingCircle";
 
-const AppLoading = () => {
+const AppLoading = ({text}) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.appname}>
-        Scientific Groups
-      </Text>
+      {text ? (
+        <Text style={styles.appname}>
+          {text}
+        </Text>
+      ) : null
+      }
       <View style={styles.loadingContainer}>
         <RotatingCircle size={30} color="#5f4a93" style={styles.loadingIcon}/>
         <Text style={styles.loadingText}>Loading ...</Text>
