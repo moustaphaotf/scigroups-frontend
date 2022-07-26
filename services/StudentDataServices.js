@@ -2,8 +2,8 @@ import axiosClient from './axios.js';
 
 
 export default class StudentDataServices {
-  static getAllStudents(){
-    return axiosClient.get(`/groups`);
+  static getAllStudents(groupId){
+    return axiosClient.get(`/groups/${groupId}/students`);
   }
 
   static getStudentById(id){
@@ -14,8 +14,8 @@ export default class StudentDataServices {
     return axiosClient.put(`/students/${id}`, data);
   }
   
-  static insertStudent(data){
-    return axiosClient.post(`/groups/${id}/students/`, data);
+  static insertStudent({groupId, ...data}){
+    return axiosClient.post(`/groups/${groupId}/students/`, data);
   }
 
   static deleteStudent(id){
