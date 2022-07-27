@@ -10,7 +10,14 @@ const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 3,
-    
+    backgroundColor: '#eee'
+  },
+  listItem:{
+    marginTop: 10,
+    borderRadius: 10,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    padding: 10
   }
 });
 
