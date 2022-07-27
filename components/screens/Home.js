@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, TouchableOpacity, View, Text, Modal } from "react-native";
 import globalStyles, { AddIcon } from "../../global";
 import GroupDataServices from "../../services/GroupDataServices";
+import Empty from "../Empty";
 import {GroupAddForm} from "../GroupForm";
 import AppLoading from './AppLoading';
 
@@ -57,16 +58,23 @@ const Home = ({navigation}) => {
           formRole="Ajouter un nouveau groupe"
         />
       </Modal>
-      {dataLoaded ? (
-        <FlatList 
-          data={[...groups]}
-          renderItem={renderItem}
-          keyExtractor={item => item._id}
-        /> ): (
+      {dataLoaded ? 
+          groups.length > 0 ? (
+            <>
+              <FlatList 
+                data={[...groups]}
+                renderItem={renderItem}
+                keyExtractor={item => item._id}
+              /> 
+              <AddIcon onPress={() => setModalOpen(true)}/>
+            </> ) : (
+            <>
+              <Empty text="Il n'y aucun groupe encore" />  
+              <AddIcon onPress={() => setModalOpen(true)}/>
+            </> 
+        ) : (
           <AppLoading />
-        )
-      }
-      <AddIcon onPress={() => setModalOpen(true)} />
+      )}
     </View>
   );
 }
