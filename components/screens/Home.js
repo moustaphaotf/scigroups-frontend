@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, TouchableOpacity, View, Text, Modal } from "react-native";
 import globalStyles, { AddIcon } from "../../global";
 import GroupDataServices from "../../services/GroupDataServices";
+import {GroupAddForm} from "../GroupForm";
 import AppLoading from './AppLoading';
 
 const Home = ({navigation}) => {
   const [groups, setGroups] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     retrieveGroups();
@@ -40,8 +42,21 @@ const Home = ({navigation}) => {
     );
   }
 
+  const handleInsert = (newGroup) => 
+    setGroups([newGroup, ...groups]);
+
   return (
     <View style={globalStyles.container}>
+      <Modal
+        visible={modalOpen}
+        animationType='slide'
+      >
+        <GroupAddForm 
+          handleInsert={handleInsert}
+          setModalOpen={setModalOpen}
+          formRole="Ajouter un nouveau groupe"
+        />
+      </Modal>
       {dataLoaded ? (
         <FlatList 
           data={[...groups]}
@@ -51,6 +66,7 @@ const Home = ({navigation}) => {
           <AppLoading />
         )
       }
+      <AddIcon onPress={() => setModalOpen(true)} />
     </View>
   );
 }
@@ -65,6 +81,7 @@ const styles = StyleSheet.create({
   date: {
     color: 'gray'
   }
+
 })
 
 export default Home;
