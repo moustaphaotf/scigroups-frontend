@@ -17,10 +17,14 @@ export const CloseIcon = ({style, onPress}) =>(
   />
 );
 
+export const globalColors = {
+  main: '#5f4a93',
+  danger: "#CA0B00",
+}
 
 const globalStyles = StyleSheet.create({
   headerStyle: {
-    backgroundColor: "#5f4a93"
+    backgroundColor: globalColors.main
   },
   headerTitleStyle: {
     color: '#eee'
@@ -52,7 +56,22 @@ const globalStyles = StyleSheet.create({
     color:"#333",
     fontSize:30,
     padding: 2,
-  }
+  },
+  inputField: {
+    borderWidth: 1,
+    marginHorizontal: 5,
+    marginBottom: 20,
+    padding: 10,
+    borderRadius: 5
+  },
+  formRole: {
+    fontSize: 20,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    padding: 20,
+    fontFamily: 'nunito-bold',
+    marginBottom: 10,
+  },
 });
 
 export default globalStyles;
