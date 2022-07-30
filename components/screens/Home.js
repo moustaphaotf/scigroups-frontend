@@ -6,6 +6,7 @@ import GroupDataServices from "../../services/GroupDataServices";
 import Empty from "../Empty";
 import {GroupAddForm} from "../GroupForm";
 import AppLoading from './AppLoading';
+moment.locale('fr');
 
 const Home = ({navigation}) => {
   const [groups, setGroups] = useState([]);
@@ -35,7 +36,7 @@ const Home = ({navigation}) => {
         <View style={globalStyles.listItem}>
           <Text style={styles.text}>{item.name}</Text>
           <Text style={styles.date}>
-            Date created:&nbsp;&nbsp;
+            Date de création:&nbsp;&nbsp;
             <Text style={{fontWeight: 'bold'}}>{moment(item.dateCreated).fromNow()}</Text>
           </Text>
         </View>
