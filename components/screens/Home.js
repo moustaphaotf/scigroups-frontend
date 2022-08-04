@@ -1,7 +1,8 @@
+import { AntDesign } from "@expo/vector-icons";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, TouchableOpacity, View, Text, Modal } from "react-native";
-import globalStyles, { AddIcon } from "../../global";
+import globalStyles, { AddIcon, amountToString } from "../../global";
 import GroupDataServices from "../../services/GroupDataServices";
 import Empty from "../Empty";
 import {GroupAddForm} from "../GroupForm";
@@ -15,7 +16,7 @@ const Home = ({navigation}) => {
 
   useEffect(() => {
     retrieveGroups();
-  }, []);
+  });
 
   const retrieveGroups = async () => {
     await GroupDataServices.getAllGroups()
@@ -32,14 +33,23 @@ const Home = ({navigation}) => {
     return (
       <TouchableOpacity
         onPress={() => navigation.push('Group', item)}
+        style={[globalStyles.listItem, globalStyles.itemRow]}
       >
-        <View style={globalStyles.listItem}>
-          <Text style={styles.text}>{item.name}</Text>
-          <Text style={styles.date}>
+        <View style={{flex: 1}}>
+          <Text style={styles.itemName}>{item.name}</Text>
+          <Text style={styles.title}>
             Date de création:&nbsp;&nbsp;
-            <Text style={{fontWeight: 'bold'}}>{moment(item.dateCreated).fromNow()}</Text>
+            <Text style={styles.content}>{moment(item.dateCreated).fromNow()}</Text>
+          </Text>
+          <Text style={styles.title}>
+            Montant total: &nbsp;&nbsp;
+            <Text style={styles.content}>{amountToString(item.totalAmount)}</Text>
           </Text>
         </View>
+
+        <TouchableOpacity onPress={() => console.log("Editing ...")}>
+          <AntDesign name="edit" size={20} color="gray"/>
+        </TouchableOpacity>
       </TouchableOpacity>
     );
   }
@@ -81,14 +91,18 @@ const Home = ({navigation}) => {
 }
 
 const styles = StyleSheet.create({
-  text: {
+  itemName: {
     fontFamily: 'nunito-regular',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10
   },
-  date: {
-    color: 'gray'
+  title: {
+    color: 'gray',
+    marginBottom: 2
+  },
+  content:{
+    fontWeight: 'bold'
   }
 
 })
