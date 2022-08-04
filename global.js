@@ -1,6 +1,24 @@
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
 
+export const amountToString = (amount, sep = ' ') => {
+  amount = amount.toString();
+  let reversed = '';
+
+  for(let i = amount.length - 1, j = 1; i >= 0; i--, j++){
+    reversed += amount[i];
+    j++;
+    if(j % 3 === 0) reversed += sep;
+  }
+
+  amount = '';
+  for(let i = reversed.length - 1; i >= 0; i--){
+    amount += reversed[i];
+  }
+
+  return amount + ' GNF';
+}
+
 export const AddIcon = ({style, onPress}) =>(
   <MaterialIcons 
     onPress={onPress}
@@ -41,6 +59,11 @@ const globalStyles = StyleSheet.create({
     borderWidth: 1,
     padding: 10
   },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  }
+  ,
   addIcon: {
     position: 'absolute',
     bottom: 40,
