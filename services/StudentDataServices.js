@@ -10,7 +10,7 @@ export default class StudentDataServices {
     return axiosClient.get(`/groups/${id}`);
   }
 
-  static updateStudent(id, data){
+  static updateStudent({id, ...data}){
     return axiosClient.put(`/students/${id}`, data);
   }
   
