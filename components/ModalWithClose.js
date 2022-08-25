@@ -2,7 +2,7 @@ import { Keyboard, Modal, StyleSheet, View } from "react-native";
 import { TouchableWithoutFeedback } from "react-native";
 import globalStyles, { CloseIcon } from "../global";
 
-const ModalWithClose = ({opened, setOpened, children}) => {
+const ModalWithClose = ({opened, setOpened, onClose, children}) => {
 
   return (
     <Modal
@@ -13,7 +13,10 @@ const ModalWithClose = ({opened, setOpened, children}) => {
         <View style={globalStyles.container}>
           <CloseIcon 
             style={styles.close}
-            onPress={() => setOpened(false)} 
+            onPress={() => {
+              setOpened(false);
+              onClose();
+            }} 
           />
           {children}
         </View>
