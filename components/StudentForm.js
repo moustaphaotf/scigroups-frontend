@@ -6,13 +6,21 @@ import * as yup from 'yup';
 import StudentDataServices from '../services/StudentDataServices';
 import RotatingCircle from './RotatingCircle';
 
-const StudentAddForm = ({ handleInsert, route, formRole}) =>  {
-  const [firstname, setFirstname] = useState ("");
-  const [lastname, setLastname] = useState ("");
-  const [genre, setGenre] = useState ("m");
-  const [phone, setPhone] = useState ("");
-  const [schoolOfOrigin, setSchoolOfOrigin] = useState ("");
-  const [grade, setGrade] = useState ("");
+const StudentAddForm = ({ handleInsert, handleUpdate, toEdit, route}) =>  {
+  const [firstname, setFirstname] = useState (toEdit?.firstname ?? "");
+  const [lastname, setLastname] = useState (toEdit?.lastname ?? "");
+  const [genre, setGenre] = useState (toEdit?.genre ?? "M");
+  const [phone, setPhone] = useState (toEdit?.phone ?? "");
+  const [schoolOfOrigin, setSchoolOfOrigin] = useState (toEdit?.schoolOfOrigin ?? "");
+  const [grade, setGrade] = useState (toEdit?.grade ?? "");
+  const [dateRegistered, setDateRegistered] = useState(() => {
+    // guess the registered date whether the student is newly created or not
+    if(toEdit?.currentGroup){
+      return toEdit.currentGroup[0].dateRegistered;
+    }else if(toEdit?.groups){
+      return toEdit.groups[0].dateRegistered;
+    }
+  })
 
   const [inserting, setInserting] = useState(false);
   const [error, setError] = useState('');
@@ -21,35 +29,64 @@ const StudentAddForm = ({ handleInsert, route, formRole}) =>  {
     setError('');
   }, [firstname, lastname, genre, phone, schoolOfOrigin, grade])
 
+  const insert = data => {
+    StudentDataServices.insertStudent(data)
+    .then(response => {
+      handleInsert(response.data);
+    })
+    .then(() => setInserting(false))
+    .catch(e => console.log(e));
+  }
+
+  const update = data => {
+    StudentDataServices.updateStudent(data)
+    .then(response => {
+      handleUpdate(response.data);
+    })
+    .then(() => setInserting(false))
+    .catch(e => console.log(e));
+  }
+  
   const handleSubmit = () =>{
-    const data = {
+    // Constructing the data based on insert or update
+    let schema = null, data = {
       firstname, lastname,
       genre, phone, grade,
       schoolOfOrigin
     };
-
-    const schema = yup.object().shape({
-      genre: yup.string().required().length(1),
-      grade: yup.string().required(),
-      schoolOfOrigin: yup.string().required().min(3).max(50),
-      phone: yup.string().required().min(9).max(20).matches(new RegExp('^[0-9]{9,20}$')),
-      lastname: yup.string().required().min(3).max(20),
-      firstname: yup.string().required().min(3).max(50),
-    });
+    if(toEdit){
+      schema = yup.object().shape({
+        genre: yup.string().required().length(1),
+        grade: yup.string().required(),
+        schoolOfOrigin: yup.string().required().min(3).max(50),
+        phone: yup.string().required().min(9).max(20).matches(new RegExp('^[0-9]{9,20}$')),
+        lastname: yup.string().required().min(3).max(20),
+        firstname: yup.string().required().min(3).max(50),
+        dateRegistered: yup.date().required()
+      });
+      data.dateRegistered = dateRegistered;
+    }else{
+      schema = yup.object().shape({
+        genre: yup.string().required().length(1),
+        grade: yup.string().required(),
+        schoolOfOrigin: yup.string().required().min(3).max(50),
+        phone: yup.string().required().min(9).max(20).matches(new RegExp('^[0-9]{9,20}$')),
+        lastname: yup.string().required().min(3).max(20),
+        firstname: yup.string().required().min(3).max(50),
+      });
+    }
     
     const groupId = route.params._id;
 
     schema.validate(data)
       .then(val => {
         setInserting(true);
-    
-        StudentDataServices.insertStudent({groupId, ...data})
-          .then(response => {
-            console.log(response);
-            handleInsert(response.data);
-          })
-          .then(() => setInserting(false))
-          .catch(e => console.log(e));
+        
+        if(toEdit){
+          update({id:toEdit._id, ...data});
+        }else{
+          insert({groupId, ...data});
+        }
       })
       .catch(e => {
         setError(e.errors[0])
@@ -59,7 +96,9 @@ const StudentAddForm = ({ handleInsert, route, formRole}) =>  {
 
   return (
     <>
-      <Text style={globalStyles.formRole}>{formRole}</Text>
+      <Text style={globalStyles.formRole}>
+        {toEdit ? "Modifier un élève" : "Ajout d'un élève"}
+        </Text>
       <ScrollView>
         <TextInput
           style={globalStyles.inputField}
@@ -76,6 +115,7 @@ const StudentAddForm = ({ handleInsert, route, formRole}) =>  {
         <TextInput 
           style={globalStyles.inputField}
           value={phone}
+          keyboardType={'phone-pad'}
           placeholder="Téléphone"
           onChangeText={(newText) => setPhone(newText)}
         />
@@ -91,12 +131,20 @@ const StudentAddForm = ({ handleInsert, route, formRole}) =>  {
           onChangeText={(newText) => setGrade(newText)}
           placeholder="Niveau"
         />
-        <RadioButton style={styles.radio} value={genre} setGenre={setGenre} PROP={[{key: 'm', text: 'Homme'}, {key: 'f', text: 'Femme'}]}/>
+        {toEdit && 
+          <TextInput 
+            style={globalStyles.inputField}
+            value={dateRegistered}
+            onChangeText={(newText) => setDateRegistered(newText)}
+            placeholder="Date d'inscription"
+          />
+        }
+        <RadioButton style={styles.radio} value={genre} setGenre={setGenre} options={[{key: 'M', text: 'Homme'}, {key: 'F', text: 'Femme'}]}/>
         {error !== '' && 
           <Text style={globalStyles.error}>{error}</Text>
         }
         <Button
-          title="Ajouter"
+          title= {toEdit ? 'Modifier' : "Ajouter"}
           style={{backgroundColor: "#eee"}}
           onPress={handleSubmit}
         />
@@ -113,7 +161,6 @@ const StudentAddForm = ({ handleInsert, route, formRole}) =>  {
 
 const styles = StyleSheet.create({
   spinner: {
-    marginTop: 30,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center'
