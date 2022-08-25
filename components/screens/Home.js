@@ -1,18 +1,20 @@
 import { AntDesign } from "@expo/vector-icons";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { FlatList, StyleSheet, TouchableOpacity, View, Text, Modal } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import globalStyles, { AddIcon, amountToString } from "../../global";
 import GroupDataServices from "../../services/GroupDataServices";
 import Empty from "../Empty";
 import {GroupAddForm} from "../GroupForm";
 import AppLoading from './AppLoading';
+import ModalWithClose from '../ModalWithClose';
 moment.locale('fr');
 
 const Home = ({navigation}) => {
   const [groups, setGroups] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [groupToEdit, setGroupToEdit] = useState(null);
 
   useEffect(() => {
     retrieveGroups();
@@ -41,42 +43,60 @@ const Home = ({navigation}) => {
             Date de création:&nbsp;&nbsp;
             <Text style={styles.content}>{moment(item.dateCreated).fromNow()}</Text>
           </Text>
-          <Text style={styles.title}>
-            Montant total: &nbsp;&nbsp;
-            <Text style={styles.content}>{amountToString(item.totalAmount)}</Text>
-          </Text>
+          {item.totalAmount ? (
+            <Text style={styles.title}>
+              Montant total: &nbsp;&nbsp;
+              <Text style={styles.content}>{amountToString(item.totalAmount)}</Text>
+            </Text>
+          ): null }
         </View>
 
-        <TouchableOpacity onPress={() => console.log("Editing ...")}>
+        <TouchableOpacity onPress={() => {setGroupToEdit(item); setModalOpen(true)}}>
           <AntDesign name="edit" size={20} color="gray"/>
         </TouchableOpacity>
       </TouchableOpacity>
     );
   }
 
-  const handleInsert = (newGroup) => 
+  const handleInsert = (newGroup) => {
     setGroups([newGroup, ...groups]);
+    setModalOpen(false);
+  }
+  
+  const handleUpdate = (edited) => {
+    setGroups(oldGroups => {
+      const updatedGroups = 
+        oldGroups.map(g => g._id === edited._id ? edited : g)
+      return updatedGroups;
+    });
+    setModalOpen(false);
+  }
 
   return (
     <View style={globalStyles.container}>
-      <Modal
-        visible={modalOpen}
-        animationType='slide'
+      <ModalWithClose
+        opened={modalOpen}
+        setOpened={setModalOpen}
+        onClose={() => {
+          if(groupToEdit) 
+            setGroupToEdit(null)
+        }} 
       >
         <GroupAddForm 
           handleInsert={handleInsert}
-          setModalOpen={setModalOpen}
-          formRole="Ajouter un nouveau groupe"
+          handleUpdate={handleUpdate}
+          toEdit={groupToEdit}
         />
-      </Modal>
+      </ModalWithClose>
       {dataLoaded ? 
           groups.length > 0 ? (
             <>
               <FlatList 
+                style={{paddingBottom:100}}
                 data={[...groups]}
                 renderItem={renderItem}
                 keyExtractor={item => item._id}
-              /> 
+              />
               <AddIcon onPress={() => setModalOpen(true)}/>
             </> ) : (
             <>

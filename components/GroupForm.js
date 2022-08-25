@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { 
   ScrollView, 
   TextInput, 
@@ -8,45 +8,108 @@ import {
   Text, 
   TouchableWithoutFeedback, 
   View } from "react-native"
-import globalStyles, { CloseIcon } from "../global";
+import globalStyles from "../global";
 import GroupDataServices from "../services/GroupDataServices";
 import RotatingCircle from "./RotatingCircle";
+import * as yup from 'yup';
 
-export const GroupAddForm = ({ setModalOpen , formRole, handleInsert}) => {
-  const [groupName, setGroupName] = useState('');
+export const GroupAddForm = ({ toEdit, handleInsert, handleUpdate}) => {
+  const [groupName, setGroupName] = useState(toEdit?.name ?? '');
+  const [dateCreated, setDateCreated] = useState(toEdit?.dateCreated ?? new Date().toISOString());
   const [inserting, setInserting] = useState(false);
+  const [error, setError] = useState('');
+  const [formRole, setFormRole]  = useState(toEdit ? 'Modifier un groupe' : 'Ajouter un groupe');
+
+  useEffect(() => {
+    setError('');
+  }, [groupName, dateCreated])
+
+  const insert = (data) => {
+    GroupDataServices.insertGroup(data)
+    .then(response => {
+      if(response.data){
+        handleInsert(response.data);
+      }
+    }).catch(e => console.log(e))
+    .finally(() => setInserting(false));
+  }
+
+  const update = (data) => {
+    GroupDataServices.updateGroup(data)
+    .then(response => {
+      if(response.data){
+        handleUpdate(response.data);
+      }
+    }).catch(e => console.log(e))
+    .finally(() => setInserting(false));
+  }
 
   const handleSubmit = async (name) => {
+    // validating data
+    let schema = null;
+    if(toEdit){
+      schema =  yup.object().shape({
+        name: yup.string().min(3).max(100).required(),
+        dateCreated: yup.date().required()
+      });
+    }else{
+      schema = yup.object().shape({
+        name: yup.string().min(3).max(100).required()
+      });
+    }
+    const data = toEdit 
+      ? {name: groupName, dateCreated} 
+      : {name: groupName};
+
+    schema.validate(data)
+      .then(() => {
+        // Depending on the case, we call the adequate function
+        setInserting(true);
+        if(toEdit){
+          update({id:toEdit._id, ...data})
+        }else{
+          insert(data)
+        }
+
+      })
+      .catch(e => {
+        setError(e.errors[0])
+        console.log(e);
+      })
     if(name.length < 3 || name.length > 100){
       Alert.alert('Oups', 'Le nombre de caractères requis pour le nom doit être entre 3 et 100');
     }
     else{
-      setInserting(true);
-      await GroupDataServices.insertGroup({name})
-        .then(response => {
-          if(response.data){
-            handleInsert(response.data);
-            setModalOpen(false);
-          }
-        }).catch(e => console.log(e))
-        .finally(() => setInserting(false));
+      
+      
     }
   }
 
   return (
     <TouchableWithoutFeedback>
       <View style={globalStyles.container}>
-        <CloseIcon style={styles.close} onPress={() => setModalOpen(false)}/>
         <Text style={styles.formRole}>{formRole}</Text>
         <ScrollView contentContainerStyle={styles.form}>
+          {error !== '' &&
+            <Text style={globalStyles.error}>{error}</Text>
+          }
           <TextInput
             style={styles.input}
             placeholder="Nom du groupe..."
             onChangeText={(newName) => setGroupName(newName)}
+            value={groupName}
           />
+          {toEdit && 
+            <TextInput
+              style={styles.input}
+              placeholder="Date de création..."
+              onChangeText={(newDate) => setDateCreated(newDate)}
+              value={dateCreated}
+            />
+          }
           <Button
-            onPress={() => handleSubmit(groupName)}
-            title="Ajouter"
+            onPress={handleSubmit}
+            title={toEdit ? "Modifier" : "Ajouter"}
           />
           {inserting ? (
             <View style={styles.spinner}>
