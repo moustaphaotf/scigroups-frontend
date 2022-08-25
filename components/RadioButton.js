@@ -1,34 +1,32 @@
-import React, { Component } from 'react';
+import {useEffect, useState } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-export default class RadioButton extends Component {
-	state = {
-		value: this.props.value,
-	};
-	render() {
-		const { PROP, setGenre } = this.props;
-		const { value } = this.state;
-		return (
-			<View style={[this.props.style, {flexDirection: 'row', justifyContent: 'center'}]}>
-				{PROP.map(res => {
-					return (
-						<TouchableOpacity key={res.key} style={styles.container}
-              onPress={() => {
-                this.setState({
-                  value: res.key,
-                });
-                setGenre(this.state.value);
-              }}
-            >
-              <Text style={styles.radioText}>{res.text}</Text>
-              <View style={styles.radioCircle}>
-                {value === res.key && <View style={styles.selectedRb} />}
-              </View>
-						</TouchableOpacity>
-					);
-				})}
-			</View>
-		);
-	}
+const RadioButton = (props) =>{
+	const [value, setValue] = useState('');
+
+	useEffect(() => {
+		setValue(props.value);
+	}, []);
+
+	const { options, setGenre } = props;
+	return (
+		<View style={[props.style, {flexDirection: 'row', justifyContent: 'center'}]}>
+			{options.map(res => {
+				return (
+					<TouchableOpacity key={res.key} style={styles.container}
+						onPress={() => {
+							setValue(res.key);
+							setGenre(value);
+						}}
+					>
+						<Text style={styles.radioText}>{res.text}</Text>
+						<View style={styles.radioCircle}>
+							{value === res.key && <View style={styles.selectedRb} />}
+						</View>
+					</TouchableOpacity>
+				);
+			})}
+		</View>
+	);
 }
 const styles = StyleSheet.create({
 	container: {
@@ -59,3 +57,5 @@ const styles = StyleSheet.create({
 		backgroundColor: '#3740ff',
   }
 });
+
+export default RadioButton;
