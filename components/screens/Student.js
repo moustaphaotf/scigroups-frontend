@@ -19,7 +19,13 @@ const Student = ({route}) => {
 
   
   const retrieveFees = () => {
-    FeeDataServices.getAllFees(route.params.currentGroup[0].groupId, route.params._id)
+    // for a newly created student, groupId info is inside the groups' zero
+    // if not, on loading, the student come up with a currentGroup property
+    let groupId = '';
+    if(route.params.currentGroup) groupId = route.params.currentGroup[0].groupId;
+    else groupId = route.params.groups[0].groupId;
+    
+    FeeDataServices.getAllFees(groupId, route.params._id)
       .then( response => {
         setFees(response.data);
         setDataLoaded(true);
