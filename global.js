@@ -94,7 +94,12 @@ const globalStyles = StyleSheet.create({
     padding: 20,
     fontFamily: 'nunito-bold',
     marginBottom: 10,
-  },
+  }, 
+  error: {
+    color: globalColors.danger,
+    marginBottom: 20,
+    textAlign: 'center'
+  }
 });
 
 export default globalStyles;

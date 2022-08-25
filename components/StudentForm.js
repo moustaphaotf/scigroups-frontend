@@ -93,7 +93,7 @@ const StudentAddForm = ({ handleInsert, route, formRole}) =>  {
         />
         <RadioButton style={styles.radio} value={genre} setGenre={setGenre} PROP={[{key: 'm', text: 'Homme'}, {key: 'f', text: 'Femme'}]}/>
         {error !== '' && 
-          <Text style={styles.error}>{error}</Text>
+          <Text style={globalStyles.error}>{error}</Text>
         }
         <Button
           title="Ajouter"
@@ -120,11 +120,6 @@ const styles = StyleSheet.create({
   },
   radio: {
     marginBottom: 20
-  }, 
-  error: {
-    color: globalColors.danger,
-    marginBottom: 20,
-    textAlign: 'center'
   }
 });
 
