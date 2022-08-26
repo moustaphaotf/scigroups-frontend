@@ -5,9 +5,10 @@ import globalStyles, { globalColors } from '../global';
 import FeeDataServices from '../services/FeeDataServices';
 import RotatingCircle from './RotatingCircle';
 
-const FeeAddForm = ({route, handleInsert}) => {
-  const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
+const FeeAddForm = ({handleUpdate, toEdit, route, handleInsert}) => {
+  const [amount, setAmount] = useState(toEdit?.amount ?? "");
+  const [description, setDescription] = useState(toEdit?.description ?? "");
+  const [paidAt, setPaidAt] = useState(toEdit?.paidAt ?? new Date().toISOString());
   const [error, setError] = useState("");
   const [inserting, setInserting] = useState(false);
 
@@ -15,37 +16,68 @@ const FeeAddForm = ({route, handleInsert}) => {
     setError("");
   }, [amount, description])
 
+  const insert = (data) => {
+    FeeDataServices.insertFee(data)
+    .then(response => {
+      handleInsert(response.data);
+    })
+    .catch(e => console.log(e))
+    .finally(() => setInserting(false));
+  }
+
+  const update = (data) => {
+    FeeDataServices.updateFee(data)
+    .then(response => {
+      handleUpdate(response.data);
+    })
+    .catch(e => console.log(e))
+    .finally(() => setInserting(false));
+  }
+
   const handleSubmit = () => {
-    const data = { description, amount };
-    const schema = yup.object().shape({
-      description: yup.string().max(255),
-      amount: yup.number().min(0)
-    });
+    let schema = null, data = { description, amount };
+    
+    if(toEdit){
+      schema = yup.object().shape({
+        description: yup.string().max(255),
+        amount: yup.number().min(0),
+        paidAt: yup.date().required()
+      });
+      data.paidAt = paidAt;
+    }else{
+      schema = yup.object().shape({
+        description: yup.string().max(255),
+        amount: yup.number().min(0)
+      });
+    }
 
     schema.validate(data)
       .then(val => {
         setInserting(true);
-        FeeDataServices.insertFee({
-          groupId: route.params.currentGroup[0].groupId,
-          studentId: route.params._id,
-          ...data
-        })
-        .then(response => {
-          handleInsert(response.data);
-          setInserting(false);
-        });
-        setAmount("");
-        setDescription("");
+        
+        if(toEdit){
+          update({id: toEdit._id, ...data});
+        }else{
+          insert({
+            groupId: route.params.currentGroup[0].groupId,
+            studentId: route.params._id,
+            ...data
+          });
+        }
       })
       .catch(e => {
         setError(e.errors??[0]);
         console.log(e.errors);
       })
-      .finally(() => setInserting(false));
   }
 
   return (
     <View >
+      {toEdit && 
+        <Text style={globalStyles.formRole}>
+          Modifier un paiement
+        </Text>
+      }
       {error !== '' && <Text style={styles.error}>{error}</Text>}
       <TextInput
         style={[globalStyles.inputField, styles.input]}
@@ -59,14 +91,19 @@ const FeeAddForm = ({route, handleInsert}) => {
         placeholder="Description" 
         onChangeText={newValue => setDescription(newValue)}
       />
-      {!inserting && 
-        <Button
-          onPress={handleSubmit}
-          title="Ajouter"
-          style={{marginBottom: 10}}
-        />
-      }
-      {inserting && <View style={styles.spinner}><RotatingCircle color={globalColors.main}/></View>}
+      {toEdit &&  
+        <TextInput
+          style={[globalStyles.inputField, styles.input]}
+          value={paidAt} 
+          placeholder="Description" 
+          onChangeText={newValue => setPaidAt(newValue)}
+        />}
+      <Button
+        onPress={handleSubmit}
+        title={toEdit ? "Modifier" : "Ajouter"}
+        style={{marginBottom: 10}}
+      />
+      {inserting && <View style={[styles.spinner, !toEdit && {marginTop: 10}]}><RotatingCircle color={globalColors.main}/></View>}
     </View>
   );
 }
@@ -76,6 +113,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   spinner: {
+    marginTop: 50,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

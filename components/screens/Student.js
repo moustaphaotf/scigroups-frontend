@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { FontAwesome, Feather, MaterialIcons, Entypo } from '@expo/vector-icons';
+import { FontAwesome, Feather, MaterialIcons, Entypo, AntDesign } from '@expo/vector-icons';
 import { FeeAddForm } from "../FeeForm";
 import { useEffect, useState } from "react";
 import FeeDataServices from '../../services/FeeDataServices';
@@ -8,10 +8,13 @@ import Empty from '../Empty';
 import globalStyles, { amountToString } from "../../global";
 import AppLoading from "./AppLoading";
 import moment from "moment";
+import ModalWithClose from "../ModalWithClose";
 
 const Student = ({route}) => {
   const [fees, setFees] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [feeToEdit, setFeeToEdit] = useState(null);
 
   useEffect(() => {
     retrieveFees();
@@ -37,10 +40,22 @@ const Student = ({route}) => {
     setFees([newFee, ...fees]);
   }
   
+  const handleUpdate = (edited) => {
+    setFees(oldFees => {
+      const updatedFees = 
+        oldFees.map(f => f._id === edited._id ? edited : f)
+      
+      return updatedFees;
+    });
+    setModalOpen(false);
+  }
+  
   const renderItem = ({item}) => {
     return (
-      <TouchableOpacity >
-        <View style={globalStyles.listItem}>
+      <TouchableOpacity 
+        style={[globalStyles.listItem, globalStyles.itemRow]}
+      >
+        <View style={{flex:1}}>
           <View style={styles.row}>
             <View style={styles.icon}><MaterialIcons color="gray" name="description" size={18}/></View>
             <Text>{item.description}</Text>
@@ -54,6 +69,9 @@ const Student = ({route}) => {
             <Text>{moment(item.paidAt).fromNow()}</Text>
           </View>
         </View>
+        <TouchableOpacity onPress={() => {setFeeToEdit(item); setModalOpen(true)}}>
+          <AntDesign name="edit" size={20} color="gray"/>
+        </TouchableOpacity>        
       </TouchableOpacity>
     );
   }
@@ -61,6 +79,17 @@ const Student = ({route}) => {
   const {firstname, lastname, genre, grade, schoolOfOrigin, phone} = route.params;
   return (
     <View style={globalStyles.container}>
+      <ModalWithClose
+        opened={modalOpen}
+        setOpened={setModalOpen}
+        onClose={() => setFeeToEdit(null)}
+      >
+        <FeeAddForm
+          route={route}
+          handleUpdate={handleUpdate}
+          toEdit={feeToEdit}
+        />
+      </ModalWithClose>
       <View style={styles.personnalInfos}>
         <Text style={styles.lastname}>{lastname.toUpperCase()}</Text>
         <Text style={styles.firstname}>{firstname}</Text>
