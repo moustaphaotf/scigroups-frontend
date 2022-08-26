@@ -38,6 +38,7 @@ export const CloseIcon = ({style, onPress}) =>(
 export const globalColors = {
   main: '#5f4a93',
   danger: "#CA0B00",
+  secondary: "#5f4a9396"
 }
 
 const globalStyles = StyleSheet.create({
@@ -72,7 +73,7 @@ const globalStyles = StyleSheet.create({
     fontSize:30,
     padding: 2,
     borderRadius: '50%',
-    backgroundColor: "#5f4a9396"
+    backgroundColor: globalColors.secondary
   },
   closeIcon: {
     alignSelf: 'center',

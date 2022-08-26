@@ -1,11 +1,11 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FontAwesome, Feather, MaterialIcons, Entypo, AntDesign } from '@expo/vector-icons';
 import { FeeAddForm } from "../FeeForm";
 import { useEffect, useState } from "react";
 import FeeDataServices from '../../services/FeeDataServices';
 import { FlatList } from "react-native-gesture-handler";
 import Empty from '../Empty';
-import globalStyles, { amountToString } from "../../global";
+import globalStyles, { amountToString, globalColors } from "../../global";
 import AppLoading from "./AppLoading";
 import moment from "moment";
 import ModalWithClose from "../ModalWithClose";
@@ -75,6 +75,13 @@ const Student = ({route}) => {
       </TouchableOpacity>
     );
   }
+
+  const handleContactActionPress = async url => {
+    const supported = await Linking.canOpenURL(url);
+    if(supported){
+      await Linking.openURL(url);
+    }
+  }
   
   const {firstname, lastname, genre, grade, schoolOfOrigin, phone} = route.params;
   return (
@@ -101,26 +108,44 @@ const Student = ({route}) => {
           <View style={styles.icon}><Feather  style={{fontSize: 18}}name="phone" /></View>
           <Text style={{fontSize: 18}}>{phone}</Text>
         </View>
+        <View style={styles.contactActions}>
+          <TouchableOpacity 
+            style={styles.contactActionsItem}
+            onPress={() => handleContactActionPress(`tel:${phone}`)}
+          >
+            <Feather name="phone-call" size={30} color={globalColors.secondary}/>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.contactActionsItem}
+            onPress={() => handleContactActionPress(`sms:${phone}`)}
+          >
+            <Entypo name="new-message" size={30} color={globalColors.secondary}/>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <FeeAddForm
-        route={route}
-        handleInsert={handleInsert}
-      />
-      {
-        dataLoaded ? 
-          fees.length > 0 ? (
-            <FlatList 
-              data={fees}
-              renderItem={renderItem}
-              keyExtractor={item => item._id}
-            />          
+      <ScrollView>
+        <FeeAddForm
+          route={route}
+          handleInsert={handleInsert}
+        />
+        {
+          dataLoaded ? 
+            fees.length > 0 ? (
+              <View>
+                <FlatList 
+                  data={fees}
+                  renderItem={renderItem}
+                  keyExtractor={item => item._id}
+                />          
+              </View>
+            ) : (
+              <Empty/>
           ) : (
-            <Empty/>
-        ) : (
-          <AppLoading />
-        )
-      }
+            <AppLoading />
+          )
+        }
+      </ScrollView>
+      
     </View>
   );
 }
@@ -133,6 +158,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'dashed',
     borderColor: 'coral'
+  },
+  contactActions: {
+    position:'absolute',
+    top: 5,
+    right: 5,
+    flexDirection: 'row'
+  },
+  contactActionsItem: {
+    marginHorizontal: 10
   },
   firstname: {
     fontSize: 18,
