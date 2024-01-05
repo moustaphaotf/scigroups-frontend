@@ -3,9 +3,11 @@ import Home from "../screens/Home";
 import Group from "../screens/Group";
 import Student from "../screens/Student";
 import globalStyles from "../../global";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { TouchableOpacity } from "react-native";
 
 const Stack = createStackNavigator();
+
 
 const HomeStack = () => {
   return (
@@ -24,7 +26,6 @@ const HomeStack = () => {
             break;
         }
         return {
-          headerMode: 'float',
           title: title,
           headerStyle: [globalStyles.headerStyle],
           headerTitleStyle: globalStyles.headerTitleStyle,
@@ -33,19 +34,8 @@ const HomeStack = () => {
     >
       <Stack.Screen
         name="Home" 
-        component={Home} 
-        options={({route, navigation}) => {
-          return {
-            headerLeft: () => 
-              <MaterialIcons 
-                style={{marginHorizontal: 15}} 
-                name="menu" 
-                color='#eee' 
-                size={24} 
-                onPress={navigation.openDrawer} 
-              />
-          }
-        }}/>
+        component={Home}
+      />
       <Stack.Screen 
         name="Group" 
         component={Group} 

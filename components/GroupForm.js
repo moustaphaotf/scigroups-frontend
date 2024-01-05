@@ -15,20 +15,20 @@ import * as yup from 'yup';
 
 export const GroupAddForm = ({ toEdit, handleInsert, handleUpdate}) => {
   const [groupName, setGroupName] = useState(toEdit?.name ?? '');
-  const [dateCreated, setDateCreated] = useState(toEdit?.dateCreated ?? new Date().toISOString());
   const [inserting, setInserting] = useState(false);
   const [error, setError] = useState('');
   const [formRole, setFormRole]  = useState(toEdit ? 'Modifier un groupe' : 'Ajouter un groupe');
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
   useEffect(() => {
     setError('');
-  }, [groupName, dateCreated])
+  }, [groupName])
 
   const insert = (data) => {
     GroupDataServices.insertGroup(data)
     .then(response => {
       if(response.data){
-        handleInsert(response.data);
+        handleInsert();
       }
     }).catch(e => console.log(e))
     .finally(() => setInserting(false));
@@ -50,16 +50,16 @@ export const GroupAddForm = ({ toEdit, handleInsert, handleUpdate}) => {
     if(toEdit){
       schema =  yup.object().shape({
         name: yup.string().min(3).max(100).required(),
-        dateCreated: yup.date().required()
       });
     }else{
       schema = yup.object().shape({
-        name: yup.string().min(3).max(100).required()
+        name: yup.string().min(3).max(100).required(),
+        ownerId: yup.string().length(24)
       });
     }
-    const data = toEdit 
-      ? {name: groupName, dateCreated} 
-      : {name: groupName};
+    const data = toEdit
+     ? { name: groupName}
+     : { name: groupName, ownerId: user._id};
 
     schema.validate(data)
       .then(() => {
@@ -70,19 +70,11 @@ export const GroupAddForm = ({ toEdit, handleInsert, handleUpdate}) => {
         }else{
           insert(data)
         }
-
       })
       .catch(e => {
         setError(e.errors[0])
         console.log(e);
       })
-    if(name.length < 3 || name.length > 100){
-      Alert.alert('Oups', 'Le nombre de caractères requis pour le nom doit être entre 3 et 100');
-    }
-    else{
-      
-      
-    }
   }
 
   return (
@@ -99,14 +91,6 @@ export const GroupAddForm = ({ toEdit, handleInsert, handleUpdate}) => {
             onChangeText={(newName) => setGroupName(newName)}
             value={groupName}
           />
-          {toEdit && 
-            <TextInput
-              style={styles.input}
-              placeholder="Date de création..."
-              onChangeText={(newDate) => setDateCreated(newDate)}
-              value={dateCreated}
-            />
-          }
           <Button
             onPress={handleSubmit}
             title={toEdit ? "Modifier" : "Ajouter"}

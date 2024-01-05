@@ -5,10 +5,6 @@ export default class GroupDataServices {
   static insertGroup(data){
     return axiosClient.post(`/groups`, data);
   }
-  
-  static getAllGroups(){
-    return axiosClient.get(`/groups`);
-  }
 
   static getGroupById(id){
     return axiosClient.get(`/groups/${id}`);
@@ -20,5 +16,9 @@ export default class GroupDataServices {
 
   static deleteGroup(id){
     return axiosClient.delete(`/groups/${id}`);
+  }
+
+  static getGroupsByUser(id, sort="name.asc"){
+    return axiosClient.get(`/users/${id}/groups?sort=${sort}`);
   }
 }

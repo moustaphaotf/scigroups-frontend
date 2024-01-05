@@ -1,10 +1,12 @@
 import 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
+import {NativeBaseProvider} from 'native-base';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import AppLoading from './components/screens/AppLoading';
-import Navigator from './components/routes/Navigator';
+import HomeStack from './components/routes/HomeStack';
+import { NavigationContainer } from '@react-navigation/native';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,11 +32,15 @@ export default function App() {
   }, []);
 
   return (
-    fontLoaded ? (
-      <Navigator />
+    <NativeBaseProvider>
+    {fontLoaded ? (  
+      <NavigationContainer>
+        <HomeStack />
+      </NavigationContainer>
     ) : (
       <AppLoading text='Scientific Groups'/>
-    )
+    )}
+    </NativeBaseProvider>
   );
 }
 

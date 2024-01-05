@@ -3,7 +3,7 @@ import globalStyles from "../global";
 
 const Empty = ({text}) => {
   return (
-    <View style={[globalStyles.container, styles.container]}>
+    <View style={[styles.container]}>
       <Image 
         style={styles.emptyLogo}
         source={ require("../assets/images/empty.png") }
@@ -16,6 +16,7 @@ const Empty = ({text}) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+    flex: 1
   },
   emptyLogo: {
     width:200,

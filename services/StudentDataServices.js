@@ -2,20 +2,19 @@ import axiosClient from './axios.js';
 
 
 export default class StudentDataServices {
-  static getAllStudents(groupId){
-    return axiosClient.get(`/groups/${groupId}/students`);
-  }
-
-  static getStudentById(id){
-    return axiosClient.get(`/groups/${id}`);
+  static getAllStudents(groupId = ''){
+    return (groupId === '' 
+      ? axiosClient.get(`/students`) 
+      : axiosClient.get(`/groups/${groupId}/students`)
+    );
   }
 
   static updateStudent({id, ...data}){
     return axiosClient.put(`/students/${id}`, data);
   }
   
-  static insertStudent({groupId, ...data}){
-    return axiosClient.post(`/groups/${groupId}/students/`, data);
+  static insertStudent(data){
+    return axiosClient.post(`/students/`, data);
   }
 
   static deleteStudent(id){
